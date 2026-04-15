@@ -71,7 +71,10 @@ async def fetch_page_with_viewport(url: str) -> tuple[str, str, list]:
 
     async with async_playwright() as p:
         # launch headless chromium
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-setuid-sandbox"]
+        )
         page = await browser.new_page(viewport={"width": 1280, "height": 800})
 
         # go to the url, wait for network to settle
