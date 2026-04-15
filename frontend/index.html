@@ -470,10 +470,16 @@
 
         try {
             const resp = await fetch("/api/personalize", { method: "POST", body: formData });
+
+            // catch cases where server returns HTML error page instead of JSON
+            const contentType = resp.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                throw new Error("Server error — check if the backend is running. Status: " + resp.status);
+            }
+
             const data = await resp.json();
-
             if (!resp.ok) throw new Error(data.detail || "Something went wrong.");
-
+            
             // store results
             personalizedHTML = data.personalized_html;
             originalURL = data.original_url;
