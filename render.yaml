@@ -1,10 +1,9 @@
-# render.yaml - drop this in root for Render deploy
+# render.yaml — Docker deploy (needed for Playwright)
 services:
   - type: web
     name: troopod-ai-personalizer
-    runtime: python
-    buildCommand: cd backend && pip install -r requirements.txt
-    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    runtime: docker
+    plan: free
     envVars:
       - key: GROQ_API_KEY
         sync: false
