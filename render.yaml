@@ -1,7 +1,7 @@
 # render.yaml — Docker deploy (needed for Playwright)
 services:
   - type: web
-    name: troopod-ai-personalizer
+    name: troopod
     runtime: docker
     plan: free
     envVars:
