@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Troopod AI – Landing Page Personalizer</title>
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ---------- reset & variables ---------- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0c0c0f;
+            --surface:   #16161a;
+            --border:    #2a2a30;
+            --text:      #e8e8ec;
+            --muted:     #8888a0;
+            --accent:    #6c5ce7;
+            --accent-light: #a29bfe;
+            --success:   #00b894;
+            --danger:    #d63031;
+            --radius:    12px;
+            --font:      'DM Sans', sans-serif;
+            --mono:      'JetBrains Mono', monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ---------- layout ---------- */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* ---------- header ---------- */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .header .logo {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .header p {
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* ---------- card ---------- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 .step {
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ---------- form elements ---------- */
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: var(--accent);
+        }
+        input::placeholder {
+            color: #555;
+        }
+
+        /* toggle between upload and link */
+        .toggle-group {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            font-family: var(--font);
+            font-weight: 500;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* file upload zone */
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .dropzone:hover { border-color: var(--accent); }
+        .dropzone.has-file { border-color: var(--success); }
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .dropzone .icon { font-size: 28px; margin-bottom: 8px; }
+        .dropzone .hint { font-size: 13px; color: var(--muted); }
+        .dropzone .filename {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--success);
+            margin-top: 6px;
+        }
+
+        .hidden { display: none !important; }
+
+        .field-gap { margin-top: 16px; }
+
+        /* ---------- submit button ---------- */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ---------- progress indicator ---------- */
+        .progress {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress .step-text {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* ---------- results ---------- */
+        .result-section { margin-top: 32px; }
+
+        .analysis-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--muted);
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 700px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+
+        /* ---------- error ---------- */
+        .error-box {
+            background: rgba(214, 48, 49, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        /* ---------- comparison toggle ---------- */
+        .compare-bar {
+            display: flex;
+            gap: 0;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .compare-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            font-family: var(--font);
+            font-weight: 500;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .compare-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- header -->
+    <div class="header">
+        <div class="logo">Troopod AI</div>
+        <h1>Landing Page Personalizer</h1>
+        <p>Upload an ad creative and paste a landing page URL. We'll enhance the page to match your ad using CRO best practices.</p>
+    </div>
+
+    <!-- step 1: ad creative input -->
+    <div class="card">
+        <h2><span class="step">1</span> Ad Creative</h2>
+
+        <!-- toggle: upload vs link -->
+        <div class="toggle-group">
+            <button class="toggle-btn active" onclick="switchAdMode('upload')">Upload Image</button>
+            <button class="toggle-btn" onclick="switchAdMode('link')">Paste Image Link</button>
+        </div>
+
+        <!-- upload mode -->
+        <div id="upload-mode">
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('ad-file').click()">
+                <input type="file" id="ad-file" accept="image/*" onchange="handleFile(this)" />
+                <div class="icon">📎</div>
+                <div class="hint">Click or drag an ad image here</div>
+                <div class="filename" id="file-name"></div>
+            </div>
+        </div>
+
+        <!-- link mode -->
+        <div id="link-mode" class="hidden">
+            <input type="url" id="ad-link" placeholder="https://example.com/ad-banner.png" />
+        </div>
+    </div>
+
+    <!-- step 2: landing page url -->
+    <div class="card">
+        <h2><span class="step">2</span> Landing Page URL</h2>
+        <input type="url" id="page-url" placeholder="https://example.com/pricing" />
+    </div>
+
+    <!-- submit -->
+    <button class="btn-primary" id="submit-btn" onclick="runPersonalization()">
+        ✨ Personalize This Page
+    </button>
+
+    <!-- progress -->
+    <div class="progress hidden" id="progress">
+        <div class="spinner"></div>
+        <div class="step-text" id="progress-text">Fetching your landing page...</div>
+    </div>
+
+    <!-- error -->
+    <div class="error-box hidden" id="error-box"></div>
+
+    <!-- results -->
+    <div class="result-section hidden" id="results">
+
+        <div class="card">
+            <h2>🔍 Ad Analysis</h2>
+            <div class="analysis-box" id="analysis-text"></div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Personalized Page Preview</h2>
+
+            <!-- compare original vs personalized -->
+            <div class="compare-bar">
+                <button class="compare-btn active" onclick="showView('personalized')">Personalized</button>
+                <button class="compare-btn" onclick="showView('original')">Original</button>
+            </div>
+
+            <iframe id="preview-frame" class="preview-frame"></iframe>
+
+            <!-- action buttons -->
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="downloadHTML()">⬇ Download HTML</button>
+                <button class="btn-secondary" onclick="openInNewTab()">↗ Open in New Tab</button>
+                <button class="btn-secondary" onclick="resetForm()">🔄 Start Over</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- state ----------
+    let adMode = "upload";          // "upload" or "link"
+    let personalizedHTML = "";      // the final output
+    let originalURL = "";           // the page they gave us
+
+    // ---------- ad input toggle ----------
+    function switchAdMode(mode) {
+        adMode = mode;
+        // update button styles
+        document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+        event.target.classList.add("active");
+        // show/hide sections
+        document.getElementById("upload-mode").classList.toggle("hidden", mode !== "upload");
+        document.getElementById("link-mode").classList.toggle("hidden", mode !== "link");
+    }
+
+    // ---------- file upload handler ----------
+    function handleFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+        document.getElementById("file-name").textContent = file.name;
+        document.getElementById("dropzone").classList.add("has-file");
+    }
+
+    // ---------- comparison view toggle ----------
+    // ---------- comparison view toggle ----------
+    function showView(view) {
+        document.querySelectorAll(".compare-btn").forEach(b => b.classList.remove("active"));
+        event.target.classList.add("active");
+
+        const frame = document.getElementById("preview-frame");
+        if (view === "original") {
+            // load the LIVE site in iframe
+            frame.removeAttribute("srcdoc");
+            frame.src = originalURL;
+        } else {
+            // load our modified html
+            frame.removeAttribute("src");
+            frame.srcdoc = personalizedHTML;
+        }
+    }
+
+    // ---------- main flow ----------
+    async function runPersonalization() {
+        const pageUrl = document.getElementById("page-url").value.trim();
+        if (!pageUrl) return alert("Please enter a landing page URL.");
+
+        // build form data
+        const formData = new FormData();
+        formData.append("landing_page_url", pageUrl);
+
+        if (adMode === "upload") {
+            const file = document.getElementById("ad-file").files[0];
+            if (!file) return alert("Please upload an ad image.");
+            formData.append("ad_image", file);
+        } else {
+            const link = document.getElementById("ad-link").value.trim();
+            if (!link) return alert("Please paste an ad image link.");
+            formData.append("ad_link", link);
+        }
+
+        // show progress, hide old results
+        show("progress"); hide("results"); hide("error-box");
+        document.getElementById("submit-btn").disabled = true;
+
+        // animate progress steps
+        const steps = [
+            "Fetching your landing page...",
+            "Analyzing the ad creative...",
+            "Applying CRO enhancements...",
+            "Almost there, polishing the page...",
+        ];
+        let stepIdx = 0;
+        const stepTimer = setInterval(() => {
+            stepIdx = Math.min(stepIdx + 1, steps.length - 1);
+            document.getElementById("progress-text").textContent = steps[stepIdx];
+        }, 5000);
+
+        try {
+            const resp = await fetch("/api/personalize", { method: "POST", body: formData });
+            const data = await resp.json();
+
+            if (!resp.ok) throw new Error(data.detail || "Something went wrong.");
+
+            // store results
+            personalizedHTML = data.personalized_html;
+            originalURL = data.original_url;
+
+            // show analysis
+            document.getElementById("analysis-text").textContent = data.ad_analysis;
+
+            // show personalized preview
+            document.getElementById("preview-frame").srcdoc = personalizedHTML;
+            // set the original tab to load the live URL directly
+            document.getElementById("preview-frame").dataset.originalUrl = data.original_url;
+
+            // reveal results
+            show("results");
+        } catch (err) {
+            document.getElementById("error-box").textContent = err.message;
+            show("error-box");
+        } finally {
+            clearInterval(stepTimer);
+            hide("progress");
+            document.getElementById("submit-btn").disabled = false;
+        }
+    }
+
+    // ---------- action buttons ----------
+    function downloadHTML() {
+        const blob = new Blob([personalizedHTML], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "personalized-page.html";
+        a.click();
+    }
+
+    function openInNewTab() {
+        const win = window.open();
+        win.document.write(personalizedHTML);
+        win.document.close();
+    }
+
+    function resetForm() {
+        hide("results"); hide("error-box");
+        document.getElementById("page-url").value = "";
+        document.getElementById("ad-link").value = "";
+        document.getElementById("ad-file").value = "";
+        document.getElementById("file-name").textContent = "";
+        document.getElementById("dropzone").classList.remove("has-file");
+    }
+
+    // ---------- tiny helpers ----------
+    function show(id) { document.getElementById(id).classList.remove("hidden"); }
+    function hide(id) { document.getElementById(id).classList.add("hidden"); }
+</script>
+
+</body>
+</html>
